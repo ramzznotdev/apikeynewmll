@@ -962,30 +962,46 @@
     // ORDERKOUTA FUNCTIONS
     // ==========================================
     async function getOTP() {
-      const username = document.getElementById('loginUsername').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      if (!username || !password) {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.querySelector('#auth-section .btn-primary');
+    
+    if (!username || !password) {
         showResponse('otpResponse', { status: false, message: 'Username dan password wajib diisi' });
         return;
-      }
-
-      try {
+    }
+    
+    // Loading state
+    btn.disabled = true;
+    btn.textContent = 'Mengirim...';
+    
+    try {
         const res = await fetch(`${BASE}/api/orderkouta/get-otp`, {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify({ username, password })
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ username, password })
         });
         const data = await res.json();
         showResponse('otpResponse', data);
-        // Save session cookies
+        
         if (data.session) {
-          saveSession(data.session);
+            saveSession(data.session);
         }
-      } catch (err) {
-        showResponse('otpResponse', { status: false, message: 'Error: ' + err.message });
-      }
+        
+        // Auto-focus ke input OTP kalau sukses
+        if (data.status === true) {
+            document.getElementById('otpCode').focus();
+        }
+    } catch (err) {
+        showResponse('otpResponse', { 
+            status: false, 
+            message: 'Error: ' + err.message + '\n\nJika error 469, tunggu 5-10 menit sebelum coba lagi.'
+        });
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirim OTP';
     }
+}
 
     async function verifyOTP() {
       const otp = document.getElementById('otpCode').value;
