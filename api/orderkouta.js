@@ -29,35 +29,98 @@ class OrderkuotaClient {
     }
 
     async _request(endpoint, bodyParams = {}) {
-        const url = this.baseUrl + endpoint;
-        const ts = Date.now();
-        const defaultBody = {
-            request_time: ts, app_reg_id: 'dummy', phone_android_version: '12',
-            app_version_code: '260204', phone_uuid: 'dummy', app_version_name: '26.02.04',
-            ui_mode: 'light', phone_model: 'vivo 1920'
-        };
-        const mergedBody = { ...defaultBody, ...bodyParams };
-        if (this.token && this.username) {
-            mergedBody.auth_token = this.token;
-            mergedBody.auth_username = this.username;
-        }
-        const bodyStr = new URLSearchParams(mergedBody).toString();
-        const headers = {
-            'User-Agent': 'okhttp/5.3.2', 'Content-Type': 'application/x-www-form-urlencoded',
-            'signature': 'dummy', 'timestamp': ts.toString()
-        };
-        const cookieHeader = this._cookieString();
-        if (cookieHeader) headers['Cookie'] = cookieHeader;
-
-        try {
-            const response = await axios.post(url, bodyStr, { headers, timeout: this.timeout, responseType: 'json' });
-            this._parseCookies(response.headers['set-cookie']);
-            return { statusCode: response.status, data: response.data };
-        } catch (error) {
-            if (error.response) this._parseCookies(error.response.headers['set-cookie']);
-            throw new Error(error.message);
-        }
+    const url = this.baseUrl + endpoint;
+    const ts = Date.now();
+    
+    // Random device ID setiap request (lebih natural)
+    const randomUUID = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    
+    const defaultBody = {
+        request_time: ts,
+        app_reg_id: 'APA91b' + Math.random().toString(36).substring(2, 15),
+        phone_android_version: '13',
+        app_version_code: '260204',
+        phone_uuid: randomUUID,
+        app_version_name: '26.02.04',
+        ui_mode: 'light',
+        phone_model: 'SM-G998B',  // Samsung Galaxy S21 Ultra
+        phone_manufacture: 'samsung'
+    };
+    
+    const mergedBody = { ...defaultBody, ...bodyParams };
+    
+    if (this.token && this.username) {
+        mergedBody.auth_token = this.token;
+        mergedBody.auth_username = this.username;
     }
+    
+    const bodyStr = new URLSearchParams(mergedBody).toString();
+    
+    // Headers lebih lengkap
+    const headers = {
+        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 13; SM-G998B Build/TP1A.220624.014)',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'signature': this._generateSignature(ts),
+        'timestamp': ts.toString(),
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    
+    const cookieHeader = this._cookieString();
+    if (cookieHeader) headers['Cookie'] = cookieHeader;
+
+    try {
+        const response = await axios.post(url, bodyStr, {
+            headers,
+            timeout: this.timeout,
+            responseType: 'json',
+            // Penting: jangan follow redirect
+            maxRedirects: 0,
+            validateStatus: (status) => status < 500
+        });
+        
+        this._parseCookies(response.headers['set-cookie']);
+        
+        // Handle status 469 khusus
+        if (response.status === 469) {
+            throw new Error('Diblokir oleh server (469). Coba lagi nanti atau ganti koneksi.');
+        }
+        
+        return { statusCode: response.status, data: response.data };
+    } catch (error) {
+        if (error.response?.headers?.['set-cookie']) {
+            this._parseCookies(error.response.headers['set-cookie']);
+        }
+        
+        // Handle 469 dengan pesan lebih jelas
+        if (error.response?.status === 469) {
+            throw new Error('Server OrderKouta memblokir request. Kemungkinan: IP diblokir, terlalu banyak percobaan, atau maintenance.');
+        }
+        
+        throw new Error(error.message);
+    }
+}
+
+// Generate signature sederhana (kalau diperlukan)
+_generateSignature(ts) {
+    // Simulasi signature dari app
+    const data = ts.toString() + 'orderkuota';
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+        const char = data.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(16);
+}
 
     async getOTP(username, password) {
         this.username = username;
@@ -131,12 +194,45 @@ function getClient(req) {
 router.post('/get-otp', async (req, res) => {
     try {
         const { username, password } = req.body;
-        if (!username || !password) return res.status(400).json({ status: false, message: 'Username dan password wajib' });
+        
+        if (!username || !password) {
+            return res.status(400).json({ 
+                status: false, 
+                message: 'Username dan password wajib diisi' 
+            });
+        }
+        
         const client = getClient(req);
-        const result = await client.getOTP(username, password);
-        return res.json({ status: result.success, message: result.message, session: client.exportSession() });
+        
+        // Coba maksimal 2x dengan delay kalau kena 469
+        let result;
+        let attempts = 0;
+        const maxAttempts = 2;
+        
+        while (attempts < maxAttempts) {
+            try {
+                result = await client.getOTP(username, password);
+                break; // Sukses, keluar dari loop
+            } catch (err) {
+                attempts++;
+                if (attempts >= maxAttempts) throw err;
+                // Tunggu 2 detik sebelum retry
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+        
+        return res.json({ 
+            status: result.success, 
+            message: result.message, 
+            session: client.exportSession() 
+        });
+        
     } catch (err) {
-        return res.status(500).json({ status: false, message: err.message });
+        return res.status(500).json({ 
+            status: false, 
+            message: err.message,
+            hint: 'Jika error 469, coba: 1) Tunggu 5-10 menit 2) Ganti koneksi internet 3) Gunakan VPN'
+        });
     }
 });
 
