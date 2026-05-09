@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Docs - RAMZZPAY</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================
+       RAMZZPAY API DOCS - Dark Blue Theme
+       ========================================== */
+    
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #080c14;
+      --bg-secondary: #0d1320;
+      --bg-card: #111827;
+      --bg-card-hover: #1a2236;
+      --bg-code: #0d1117;
+      --border: #1a2a44;
+      --border-light: #243452;
+      --text-primary: #e8edf5;
+      --text-secondary: #9aafc9;
+      --text-muted: #546a8a;
+      --accent: #3b82f6;
+      --accent-light: #60a5fa;
+      --accent-dark: #1d4ed8;
+      --accent-glow: rgba(59, 130, 246, 0.5);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.1);
+      --success-border: rgba(16, 185, 129, 0.3);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --danger-border: rgba(239, 68, 68, 0.3);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --warning-border: rgba(245, 158, 11, 0.3);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-dark); }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.4s ease;
+    }
+
+    .sidebar-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-section { margin-bottom: 24px; }
+
+    .sidebar-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-link:hover { background: var(--bg-card); color: var(--text-primary); }
+    .sidebar-link.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-light); }
+
+    .sidebar-link .method-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      min-width: 38px;
+      text-align: center;
+    }
+
+    .method-badge.get { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .method-badge.post { background: rgba(59, 130, 246, 0.2); color: var(--accent-light); }
+    .method-badge.all { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+
+    /* Main */
+    .main {
+      margin-left: 280px;
+      flex: 1;
+      padding: 48px;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .section { margin-bottom: 64px; padding-top: 24px; }
+
+    .section h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .section > p { color: var(--text-secondary); margin-bottom: 32px; }
+
+    /* Endpoint Card */
+    .endpoint-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .endpoint-method {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .endpoint-method.get { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .endpoint-method.post { background: rgba(59, 130, 246, 0.1); color: var(--accent-light); border: 1px solid rgba(59, 130, 246, 0.3); }
+    .endpoint-method.all { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+
+    .endpoint-path { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 500; }
+
+    .endpoint-body { padding: 20px; }
+    .endpoint-body p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; }
+
+    /* Params Table */
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+
+    .params-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .params-table td { padding: 10px 12px; border-bottom: 1px solid rgba(26, 42, 68, 0.5); }
+
+    .params-table code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-light);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .required-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      text-transform: uppercase;
+    }
+
+    .optional-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(100, 116, 139, 0.2);
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+
+    .code-block .key { color: var(--accent-light); }
+    .code-block .string { color: #a5d6ff; }
+    .code-block .number { color: #f9a8d4; }
+    .code-block .boolean { color: #fbbf24; }
+
+    .code-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+    .copy-btn.copied { border-color: var(--success); color: var(--success); }
+
+    /* Response Box */
+    .response-box {
+      background: var(--bg-code);
+      border: 1px solid var(--success-border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-top: 16px;
+      display: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .response-box.show { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .response-box pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--success);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Try It Form */
+    .try-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .try-form input,
+    .try-form select {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      transition: border-color var(--transition);
+    }
+
+    .try-form input:focus,
+    .try-form select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .try-form input::placeholder { color: var(--text-muted); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 25px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+    .btn-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
+
+    /* Token Display */
+    .token-display {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.05));
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .token-display.show { display: block; }
+
+    .token-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--accent-light);
+      word-break: break-all;
+      background: var(--bg-code);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      margin: 8px 0;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .status-dot.offline { background: var(--danger); }
+
+    /* Status Badge */
+    .status-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .status-badge.inactive {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop.show { display: block; }
+      .sidebar-toggle { display: block; }
+      .main { margin-left: 0; padding: 24px; padding-top: 70px; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">&#9776;</button>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <a href="/" class="sidebar-logo">RAMZZPAY</a>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Status</div>
+      <div style="padding: 10px 12px; font-size: 0.85rem;">
+        <span class="status-dot" id="sessionDot"></span>
+        <span id="sessionStatus">Checking...</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Authentication</div>
+      <a href="#auth-section" class="sidebar-link active">
+        <span class="method-badge all">ANY</span> Login & Token
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">OrderKouta</div>
+      <a href="#ok-get-otp" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Get OTP
+      </a>
+      <a href="#ok-verify-otp" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Verify OTP
+      </a>
+      <a href="#ok-profile" class="sidebar-link">
+        <span class="method-badge get">GET</span> Profile
+      </a>
+      <a href="#ok-mutasi" class="sidebar-link">
+        <span class="method-badge get">GET</span> Mutasi
+      </a>
+      <a href="#ok-menu" class="sidebar-link">
+        <span class="method-badge get">GET</span> QRIS Menu
+      </a>
+      <a href="#ok-logout" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Logout
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Pakasir</div>
+      <a href="#pk-create" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Create
+      </a>
+      <a href="#pk-check" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Check
+      </a>
+      <a href="#pk-cancel" class="sidebar-link">
+        <span class="method-badge all">ANY</span> Cancel
+      </a>
+      <a href="#pk-methods" class="sidebar-link">
+        <span class="method-badge get">GET</span> Methods
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Auth Section -->
+    <section class="section" id="auth-section">
+      <h2>Authentication -- Login & Token</h2>
+      <p>Dapatkan token dengan login ke OrderKouta. Session disimpan otomatis di browser Anda.</p>
+
+      <!-- Get OTP -->
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/orderkouta/get-otp</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Kirim OTP ke WhatsApp/nomor terdaftar.</p>
+          
+          <div class="try-form">
+            <input type="text" id="loginUsername" placeholder="Username / Email / Nomor HP">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button class="btn btn-primary" onclick="getOTP()">Kirim OTP</button>
+          </div>
+          <div id="otpResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+
+      <!-- Verify OTP -->
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/orderkouta/verify-otp</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Verifikasi kode OTP yang diterima.</p>
+          
+          <div class="try-form">
+            <input type="text" id="otpCode" placeholder="Kode OTP (6 digit)">
+            <button class="btn btn-success" onclick="verifyOTP()">Verifikasi & Login</button>
+          </div>
+          <div id="verifyResponse" class="response-box"><pre></pre></div>
+          <div id="tokenDisplay" class="token-display">
+            <strong>Session Aktif:</strong>
+            <div style="margin-top: 8px;">
+              <span class="status-badge active" id="loginBadge" style="display:none;">LOGGED IN</span>
+              <span class="status-badge inactive" id="logoutBadge">NOT LOGGED IN</span>
+            </div>
+            <div class="token-value" id="tokenValue" style="font-size: 0.8rem; color: var(--text-muted);">-</div>
+            <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-top:8px;">Logout</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Verify OTP Docs -->
+    <section class="section" id="ok-verify-otp">
+      <h2>Verify OTP</h2>
+      <p>Endpoint untuk verifikasi kode OTP.</p>
+
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/orderkouta/verify-otp</span>
+        </div>
+        <div class="endpoint-body">
+          <table class="params-table">
+            <thead>
+              <tr><th>Parameter</th><th>Tipe</th><th>Wajib</th><th>Deskripsi</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>otp</code></td>
+                <td>String</td>
+                <td><span class="required-badge">Wajib</span></td>
+                <td>Kode OTP 6 digit</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-label">Contoh Response</div>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this, 'verify-response')">Copy</button>
+            <pre id="verify-response">{
+  <span class="key">"status"</span>: <span class="boolean">true</span>,
+  <span class="key">"message"</span>: <span class="string">"Login berhasil!"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"name"</span>: <span class="string">"Username"</span>,
+    <span class="key">"user_id"</span>: <span class="string">"12345"</span>,
+    <span class="key">"saldo"</span>: <span class="number">500000</span>
+  },
+  <span class="key">"session"</span>: { ... },
+  <span class="key">"next"</span>: <span class="string">"/api/orderkouta/mutasi"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile -->
+    <section class="section" id="ok-profile">
+      <h2>Profile</h2>
+      <p>Cek status session yang sedang aktif.</p>
+
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-path">/api/orderkouta/profile</span>
+        </div>
+        <div class="endpoint-body">
+          <button class="btn btn-secondary" onclick="getProfile()">Cek Profile</button>
+          <div id="profileResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mutasi -->
+    <section class="section" id="ok-mutasi">
+      <h2>Mutasi / Riwayat</h2>
+      <p>Ambil data mutasi transaksi.</p>
+
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-path">/api/orderkouta/mutasi</span>
+        </div>
+        <div class="endpoint-body">
+          <table class="params-table">
+            <thead>
+              <tr><th>Parameter</th><th>Tipe</th><th>Wajib</th><th>Deskripsi</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>page</code></td>
+                <td>Number</td>
+                <td><span class="optional-badge">Optional</span></td>
+                <td>Halaman (default: 1)</td>
+              </tr>
+              <tr>
+                <td><code>keterangan</code></td>
+                <td>String</td>
+                <td><span class="optional-badge">Optional</span></td>
+                <td>Filter keterangan</td>
+              </tr>
+              <tr>
+                <td><code>dari</code></td>
+                <td>String</td>
+                <td><span class="optional-badge">Optional</span></td>
+                <td>Tanggal mulai (YYYY-MM-DD)</td>
+              </tr>
+              <tr>
+                <td><code>ke</code></td>
+                <td>String</td>
+                <td><span class="optional-badge">Optional</span></td>
+                <td>Tanggal akhir (YYYY-MM-DD)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="try-form">
+            <input type="text" placeholder="page (default: 1)" id="mutasiPage">
+            <input type="text" placeholder="keterangan (optional)" id="mutasiKet">
+            <input type="text" placeholder="dari (YYYY-MM-DD)" id="mutasiDari">
+            <input type="text" placeholder="ke (YYYY-MM-DD)" id="mutasiKe">
+            <button class="btn btn-primary" onclick="getMutasi()">Ambil Mutasi</button>
+          </div>
+          <div id="mutasiResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QRIS Menu -->
+    <section class="section" id="ok-menu">
+      <h2>QRIS Menu</h2>
+      <p>Ambil URL download QRIS statis.</p>
+
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-path">/api/orderkouta/menu</span>
+        </div>
+        <div class="endpoint-body">
+          <button class="btn btn-secondary" onclick="getQrisMenu()">Ambil QRIS Menu</button>
+          <div id="menuResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pakasir Sections -->
+    <section class="section" id="pk-create">
+      <h2>Buat Transaksi</h2>
+      <p>Membuat transaksi pembayaran baru via Pakasir.</p>
+
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/pakasir/create</span>
+        </div>
+        <div class="endpoint-body">
+          <table class="params-table">
+            <thead>
+              <tr><th>Parameter</th><th>Tipe</th><th>Wajib</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>project</code></td>
+                <td>String</td>
+                <td><span class="required-badge">Wajib</span></td>
+              </tr>
+              <tr>
+                <td><code>order_id</code></td>
+                <td>String</td>
+                <td><span class="required-badge">Wajib</span></td>
+              </tr>
+              <tr>
+                <td><code>amount</code></td>
+                <td>Number</td>
+                <td><span class="required-badge">Wajib</span></td>
+              </tr>
+              <tr>
+                <td><code>pakasir_api_key</code></td>
+                <td>String</td>
+                <td><span class="required-badge">Wajib</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="try-form">
+            <input type="text" placeholder="Project" id="pkProject">
+            <input type="text" placeholder="Order ID (contoh: INV-001)" id="pkOrderId">
+            <input type="number" placeholder="Amount" id="pkAmount">
+            <input type="text" placeholder="Pakasir API Key" id="pkApiKey">
+            <button class="btn btn-primary" onclick="createTransaction()">Buat Transaksi</button>
+          </div>
+          <div id="createResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pk-check">
+      <h2>Cek Transaksi</h2>
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/pakasir/check</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="try-form">
+            <input type="text" placeholder="Project" id="pkCheckProject">
+            <input type="text" placeholder="Order ID" id="pkCheckOrderId">
+            <input type="number" placeholder="Amount" id="pkCheckAmount">
+            <input type="text" placeholder="Pakasir API Key" id="pkCheckApiKey">
+            <button class="btn btn-primary" onclick="checkTransaction()">Cek Status</button>
+          </div>
+          <div id="checkResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pk-cancel">
+      <h2>Batalkan Transaksi</h2>
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method all">ANY</span>
+          <span class="endpoint-path">/api/pakasir/cancel</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="try-form">
+            <input type="text" placeholder="Project" id="pkCancelProject">
+            <input type="text" placeholder="Order ID" id="pkCancelOrderId">
+            <input type="number" placeholder="Amount" id="pkCancelAmount">
+            <input type="text" placeholder="Pakasir API Key" id="pkCancelApiKey">
+            <button class="btn btn-danger" onclick="cancelTransaction()">Batalkan</button>
+          </div>
+          <div id="cancelResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pk-methods">
+      <h2>Metode Pembayaran</h2>
+      <div class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-path">/api/pakasir/methods</span>
+        </div>
+        <div class="endpoint-body">
+          <button class="btn btn-secondary" onclick="getMethods()">Ambil Metode</button>
+          <div id="methodsResponse" class="response-box"><pre></pre></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    // ==========================================
+    // SESSION MANAGER
+    // ==========================================
+    const SESSION_KEY = 'ramzzpay_session';
+
+    function getSession() {
+      const s = localStorage.getItem(SESSION_KEY);
+      return s ? JSON.parse(s) : null;
+    }
+
+    function saveSession(session) {
+      if (session) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      } else {
+        localStorage.removeItem(SESSION_KEY);
+      }
+      updateSessionUI();
+    }
+
+    function clearSession() {
+      localStorage.removeItem(SESSION_KEY);
+      updateSessionUI();
+    }
+
+    function updateSessionUI() {
+      const session = getSession();
+      const dot = document.getElementById('sessionDot');
+      const status = document.getElementById('sessionStatus');
+      const loginBadge = document.getElementById('loginBadge');
+      const logoutBadge = document.getElementById('logoutBadge');
+      const tokenValue = document.getElementById('tokenValue');
+      const tokenDisplay = document.getElementById('tokenDisplay');
+
+      if (session && session.isAuthenticated && session.token) {
+        if (dot) { dot.className = 'status-dot online'; }
+        if (status) { status.textContent = 'Logged In: ' + (session.username || 'User'); }
+        if (loginBadge) { loginBadge.style.display = 'inline'; }
+        if (logoutBadge) { logoutBadge.style.display = 'none'; }
+        if (tokenValue) { tokenValue.textContent = 'User: ' + session.username + ' | ID: ' + session.userId; }
+        if (tokenDisplay) { tokenDisplay.classList.add('show'); }
+      } else {
+        if (dot) { dot.className = 'status-dot offline'; }
+        if (status) { status.textContent = 'Not Logged In'; }
+        if (loginBadge) { loginBadge.style.display = 'none'; }
+        if (logoutBadge) { logoutBadge.style.display = 'inline'; }
+        if (tokenValue) { tokenValue.textContent = '-'; }
+        if (tokenDisplay) { tokenDisplay.classList.remove('show'); }
+      }
+    }
+
+    // Init
+    updateSessionUI();
+
+    // ==========================================
+    // SIDEBAR MOBILE
+    // ==========================================
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      sidebarBackdrop.classList.toggle('show');
+    });
+
+    sidebarBackdrop.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.remove('show');
+    });
+
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        if (window.innerWidth <= 900) {
+          sidebar.classList.remove('open');
+          sidebarBackdrop.classList.remove('show');
+        }
+      });
+    });
+
+    // ==========================================
+    // HELPER
+    // ==========================================
+    const BASE = '';
+
+    function getHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      const session = getSession();
+      if (session) {
+        headers['x-session'] = JSON.stringify(session);
+      }
+      return headers;
+    }
+
+    function showResponse(elementId, data) {
+      const box = document.getElementById(elementId);
+      box.querySelector('pre').textContent = JSON.stringify(data, null, 2);
+      box.classList.add('show');
+    }
+
+    function copyCode(btn, elementId) {
+      const pre = document.getElementById(elementId);
+      const text = pre.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // ==========================================
+    // ORDERKOUTA FUNCTIONS
+    // ==========================================
+    async function getOTP() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      if (!username || !password) {
+        showResponse('otpResponse', { status: false, message: 'Username dan password wajib diisi' });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/get-otp`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        showResponse('otpResponse', data);
+        // Save session cookies
+        if (data.session) {
+          saveSession(data.session);
+        }
+      } catch (err) {
+        showResponse('otpResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function verifyOTP() {
+      const otp = document.getElementById('otpCode').value;
+      
+      if (!otp) {
+        showResponse('verifyResponse', { status: false, message: 'Kode OTP wajib diisi' });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/verify-otp`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ otp })
+        });
+        const data = await res.json();
+        showResponse('verifyResponse', data);
+        
+        if (data.status && data.session) {
+          saveSession(data.session);
+        }
+      } catch (err) {
+        showResponse('verifyResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function logout() {
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/logout`, {
+          method: 'POST',
+          headers: getHeaders()
+        });
+        const data = await res.json();
+        clearSession();
+        showResponse('verifyResponse', data);
+      } catch (err) {
+        console.error(err);
+        clearSession();
+      }
+    }
+
+    async function getProfile() {
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/profile`, {
+          headers: getHeaders()
+        });
+        const data = await res.json();
+        showResponse('profileResponse', data);
+        if (data.session) saveSession(data.session);
+      } catch (err) {
+        showResponse('profileResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function getMutasi() {
+      const page = document.getElementById('mutasiPage').value || '1';
+      const keterangan = document.getElementById('mutasiKet').value;
+      const dari = document.getElementById('mutasiDari').value;
+      const ke = document.getElementById('mutasiKe').value;
+
+      let params = `?page=${page}`;
+      if (keterangan) params += `&keterangan=${encodeURIComponent(keterangan)}`;
+      if (dari) params += `&dari=${encodeURIComponent(dari)}`;
+      if (ke) params += `&ke=${encodeURIComponent(ke)}`;
+
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/mutasi${params}`, {
+          headers: getHeaders()
+        });
+        const data = await res.json();
+        showResponse('mutasiResponse', data);
+        if (data.session) saveSession(data.session);
+      } catch (err) {
+        showResponse('mutasiResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function getQrisMenu() {
+      try {
+        const res = await fetch(`${BASE}/api/orderkouta/menu`, {
+          headers: getHeaders()
+        });
+        const data = await res.json();
+        showResponse('menuResponse', data);
+        if (data.session) saveSession(data.session);
+      } catch (err) {
+        showResponse('menuResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    // ==========================================
+    // PAKASIR FUNCTIONS (tetap, tanpa session)
+    // ==========================================
+    async function createTransaction() {
+      const project = document.getElementById('pkProject').value;
+      const order_id = document.getElementById('pkOrderId').value;
+      const amount = document.getElementById('pkAmount').value;
+      const pakasir_api_key = document.getElementById('pkApiKey').value;
+
+      if (!project || !order_id || !amount || !pakasir_api_key) {
+        showResponse('createResponse', { status: false, message: 'Semua parameter wajib diisi' });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE}/api/pakasir/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project, order_id, amount: parseInt(amount), pakasir_api_key })
+        });
+        const data = await res.json();
+        showResponse('createResponse', data);
+      } catch (err) {
+        showResponse('createResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function checkTransaction() {
+      const project = document.getElementById('pkCheckProject').value;
+      const order_id = document.getElementById('pkCheckOrderId').value;
+      const amount = document.getElementById('pkCheckAmount').value;
+      const pakasir_api_key = document.getElementById('pkCheckApiKey').value;
+
+      if (!project || !order_id || !amount || !pakasir_api_key) {
+        showResponse('checkResponse', { status: false, message: 'Semua parameter wajib diisi' });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE}/api/pakasir/check`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project, order_id, amount: parseInt(amount), pakasir_api_key })
+        });
+        const data = await res.json();
+        showResponse('checkResponse', data);
+      } catch (err) {
+        showResponse('checkResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function cancelTransaction() {
+      const project = document.getElementById('pkCancelProject').value;
+      const order_id = document.getElementById('pkCancelOrderId').value;
+      const amount = document.getElementById('pkCancelAmount').value;
+      const pakasir_api_key = document.getElementById('pkCancelApiKey').value;
+
+      if (!project || !order_id || !amount || !pakasir_api_key) {
+        showResponse('cancelResponse', { status: false, message: 'Semua parameter wajib diisi' });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE}/api/pakasir/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project, order_id, amount: parseInt(amount), pakasir_api_key })
+        });
+        const data = await res.json();
+        showResponse('cancelResponse', data);
+      } catch (err) {
+        showResponse('cancelResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+
+    async function getMethods() {
+      try {
+        const res = await fetch(`${BASE}/api/pakasir/methods`);
+        const data = await res.json();
+        showResponse('methodsResponse', data);
+      } catch (err) {
+        showResponse('methodsResponse', { status: false, message: 'Error: ' + err.message });
+      }
+    }
+  </script>
+
+</body>
+</html>
