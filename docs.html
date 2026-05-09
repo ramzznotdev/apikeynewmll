@@ -475,6 +475,15 @@
       color: var(--danger);
       border: 1px solid var(--danger-border);
     }
+    
+    #qrPreview {
+    display: block;
+    margin: 16px auto 0;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    background: #fff;
+    }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -1044,53 +1053,97 @@
     }
 
     async function getProfile() {
-      try {
+    try {
         const res = await fetch(`${BASE}/api/orderkouta/profile`, {
-          headers: getHeaders()
+            headers: getHeaders()
         });
         const data = await res.json();
-        showResponse('profileResponse', data);
+        showResponse('profileResponse', {
+            status: data.status,
+            username: data.data?.username || '-',
+            is_authenticated: data.data?.is_authenticated || false,
+            user_id: data.data?.user_id || '-'
+        });
         if (data.session) saveSession(data.session);
-      } catch (err) {
+    } catch (err) {
         showResponse('profileResponse', { status: false, message: 'Error: ' + err.message });
-      }
     }
+}
 
     async function getMutasi() {
-      const page = document.getElementById('mutasiPage').value || '1';
-      const keterangan = document.getElementById('mutasiKet').value;
-      const dari = document.getElementById('mutasiDari').value;
-      const ke = document.getElementById('mutasiKe').value;
+    const page = document.getElementById('mutasiPage').value || '1';
+    const keterangan = document.getElementById('mutasiKet').value;
+    const dari = document.getElementById('mutasiDari').value;
+    const ke = document.getElementById('mutasiKe').value;
 
-      let params = `?page=${page}`;
-      if (keterangan) params += `&keterangan=${encodeURIComponent(keterangan)}`;
-      if (dari) params += `&dari=${encodeURIComponent(dari)}`;
-      if (ke) params += `&ke=${encodeURIComponent(ke)}`;
+    let params = `?page=${page}`;
+    if (keterangan) params += `&keterangan=${encodeURIComponent(keterangan)}`;
+    if (dari) params += `&dari=${encodeURIComponent(dari)}`;
+    if (ke) params += `&ke=${encodeURIComponent(ke)}`;
 
-      try {
+    try {
         const res = await fetch(`${BASE}/api/orderkouta/mutasi${params}`, {
-          headers: getHeaders()
+            headers: getHeaders()
         });
         const data = await res.json();
-        showResponse('mutasiResponse', data);
+        
+        // Format ulang biar mirip response PHP
+        if (data.data) {
+            showResponse('mutasiResponse', {
+                status: data.status,
+                message: 'Success Fetching QRIS Mutasi',
+                data: {
+                    account: data.data.info || data.data.account || {},
+                    mutasi: data.data.mutasi || []
+                }
+            });
+        } else {
+            showResponse('mutasiResponse', data);
+        }
+        
         if (data.session) saveSession(data.session);
-      } catch (err) {
+    } catch (err) {
         showResponse('mutasiResponse', { status: false, message: 'Error: ' + err.message });
-      }
     }
+}
 
     async function getQrisMenu() {
-      try {
+    try {
         const res = await fetch(`${BASE}/api/orderkouta/menu`, {
-          headers: getHeaders()
+            headers: getHeaders()
         });
         const data = await res.json();
-        showResponse('menuResponse', data);
+        
+        // Format QRIS menu + tampilin QR image kalo ada
+        if (data.data && data.data.download_url) {
+            showResponse('menuResponse', {
+                status: data.status,
+                message: 'QRIS Menu berhasil diambil',
+                download_url: data.data.download_url,
+                account: data.data.info || {},
+                qr_image: data.data.download_url  // Bisa langsung tampil
+            });
+            
+            // Auto tampilin QR image
+            const qrPreview = document.getElementById('qrPreview');
+            if (!qrPreview) {
+                const img = document.createElement('img');
+                img.id = 'qrPreview';
+                img.src = data.data.download_url;
+                img.style.cssText = 'max-width:200px;margin-top:16px;border-radius:8px;';
+                document.getElementById('menuResponse').appendChild(img);
+            } else {
+                qrPreview.src = data.data.download_url;
+            }
+        } else {
+            showResponse('menuResponse', data);
+        }
+        
         if (data.session) saveSession(data.session);
-      } catch (err) {
+    } catch (err) {
         showResponse('menuResponse', { status: false, message: 'Error: ' + err.message });
-      }
     }
+}
 
     // ==========================================
     // PAKASIR FUNCTIONS (tetap, tanpa session)
